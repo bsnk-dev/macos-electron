@@ -1,5 +1,5 @@
 import { useReducer, useRef } from 'react';
-import { mdiChevronLeft, mdiChevronRight, mdiClose, mdiDivision, mdiMinus, mdiPercentOutline, mdiPlusMinusVariant } from '@mdi/js';
+import { mdiChevronLeft, mdiChevronRight, mdiRefresh } from '@mdi/js';
 import clsx from 'clsx';
 import { AppIcon } from '__/components/utils/AppIcon';
 import {
@@ -20,29 +20,28 @@ const Safari = () => {
 
   function handleKeyPress(e: any) {
     if (e.key === 'Enter') {
-      setAddress({ type: 'setAddress', payload: e.target.value });
+      dispatch({ type: 'setAddress', payload: e.target.value });
+      iframeEl.current.loadURL(e.target.value);
     }
   }
 
   const iframeEl = useRef();
 
-  function setAddress(action: ActionT) {
-    dispatch(action);
-    
-    //@ts-ignore
-    if (iframeEl && iframeEl.current) iframeEl.current.src = action.payload;
-  }
-
   function go(type: 'goForwards' | 'goBack') {
-    const currentAddress = state.address;
+    (type == 'goForwards') 
+      ? iframeEl.current.goForward() 
+      : iframeEl.current.goBack();
 
-    dispatch({type: type, payload: ''});
-    
-    //@ts-ignore
-    if (iframeEl && iframeEl.current && (currentAddress != state.address)) iframeEl.current.src = state.address;
+    refreshSiteDetails();
   }
 
+  function refresh() {
+    iframeEl.current.reload()
+  }
 
+  function refreshSiteDetails() {
+    dispatch({type: 'setAddress', payload: iframeEl.current.getURL()});
+  }
 
   return (
     <section class={css.container}>
@@ -56,21 +55,23 @@ const Safari = () => {
             <button onClick={() => go('goForwards')}>
               <AppIcon size={32} path={mdiChevronRight} />
             </button>
-            <input 
-              placeholder="Search" 
-              value={address} 
-              onKeyUp={(e) => handleKeyPress(e)}
-            ></input>
+            <div style={{width: '100%', display: 'flex'}}>
+              <input 
+                placeholder="Search" 
+                value={address} 
+                onKeyUp={(e) => handleKeyPress(e)}
+              />
+
+              <button style={{marginRight: 'auto'}} onClick={refresh}>
+                <AppIcon size={20} path={mdiRefresh} />
+              </button>
+            </div>
           </div>
         </div>
         
-        <iframe src={address} ref={iframeEl} height="100%" onLoad={(e) => { 
-          dispatch({ type: 'setAddress', payload: e.path[0].contentWindow.location.href })
-          console.log(e.path[0].contentWindow.location.href);
-        }  
-        }>
+        <webview src={address} ref={iframeEl} style={{height: '100%', width: '99.9%', marginLeft: '0.1%'}}>
 
-        </iframe>
+        </webview>
       </section>
     </section>
   );

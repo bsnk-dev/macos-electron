@@ -47,7 +47,6 @@ $blue: rgba(10, 132, 255, 0.8);
 .controlButtons {
   display: flex;
   align-items: flex-end;
-  justify-content: center;
   width: 100%;
 
   transition: border 0.3s;
@@ -80,6 +79,16 @@ $blue: rgba(10, 132, 255, 0.8);
     &:focus {
       border-color: $blue;
     }
+
+    transition: background-color 0s;
+
+    &:active {
+      background-color: hsla(var(--bgcolor), 0.4);
+    }
+  }
+
+  & > .inputContainer {
+    width: 100%;
   }
 
   input {
@@ -98,13 +107,12 @@ $blue: rgba(10, 132, 255, 0.8);
 
     padding: 0.2rem 0.5rem;
     margin: 0 0.1rem;
-    margin-left: auto;
-    margin-right: auto;
-    
-    min-width: 200px;
-    width: 50%;
 
     height: 1.8rem;
+
+    margin-left: auto;
+    min-width: 200px;
+    width: 50%;
 
     :global(body.dark) & {
       --bgcolor: var(--app-color-grey-800);

@@ -3,7 +3,7 @@
     "start": "vite",
     "type-check": "tsc --noEmit",
     "type-check-watch": "tsc src/**/*.{ts,tsx} --noEmit --watch",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "test": "jest",
     "postbuild": "workbox generateSW workbox-config.js",
     "serve": "vite preview"
