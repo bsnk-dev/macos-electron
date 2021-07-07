@@ -1,5 +1,5 @@
 import { useReducer, useRef } from 'react';
-import { mdiChevronLeft, mdiChevronRight, mdiRefresh } from '@mdi/js';
+import { mdiChevronLeft, mdiChevronRight, mdiRefresh, mdiPlus } from '@mdi/js';
 import clsx from 'clsx';
 import { AppIcon } from '__/components/utils/AppIcon';
 import {
@@ -9,6 +9,7 @@ import {
   IState,
 } from './SafariReducer';
 import css from './Safari.module.scss';
+import { useEffect } from 'preact/hooks';
 
 const Safari = () => {
   const [state, dispatch] = useReducer<React.Reducer<IState, ActionT>>(
@@ -16,11 +17,13 @@ const Safari = () => {
     initialState,
   );
 
-  const { address } = state;
-
   function handleKeyPress(e: any) {
     if (e.key === 'Enter') {
-      dispatch({ type: 'setAddress', payload: e.target.value });
+      let queryOrAddress = e.target.value;
+
+      if (!queryOrAddress.startsWith('http://') || !queryOrAddress.startsWith('https://')) queryOrAddress = `https://google.com/search?q=${encodeURIComponent(queryOrAddress)}`;
+
+      dispatch({ type: 'setAddress', payload: queryOrAddress });
       iframeEl.current.loadURL(e.target.value);
     }
   }
@@ -43,6 +46,40 @@ const Safari = () => {
     dispatch({type: 'setAddress', payload: iframeEl.current.getURL()});
   }
 
+  useEffect(() => {
+    if (iframeEl && iframeEl.current) {
+      iframeEl.current.addEventListener('load-commit', (e) => {
+        refreshSiteDetails();
+
+        iframeEl.current.insertCSS(`::-webkit-scrollbar { width: 8px; /* 1px wider than Lion. */ /* This is more usable for users trying to click it. */ background-color: rgba(0,0,0,0); -webkit-border-radius: 100px; } /* hover effect for both scrollbar area, and scrollbar 'thumb' */ ::-webkit-scrollbar:hover { background-color: rgba(0, 0, 0, 0.09); }
+
+        /* The scrollbar 'thumb' ...that marque oval shape in a scrollbar */ ::-webkit-scrollbar-thumb:vertical { /* This is the EXACT color of Mac OS scrollbars. Yes, I pulled out digital color meter */ background: rgba(0,0,0,0.5); -webkit-border-radius: 100px; } ::-webkit-scrollbar-thumb:vertical:active { background: rgba(19, 5, 5, 0.61); /* Some darker color when you click it */ -webkit-border-radius: 100px; }
+       
+        background: linear-gradient(45deg, white, silver); min-height: 100%;`);
+      });
+
+      iframeEl.current.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.123 Safari/537.36');
+    }
+  });
+
+  function newTab() {
+    // ...
+  }
+
+  function tabRow() {
+    if (state.tabs.length < 2) return '';
+    
+    return state.tabs.map(tab => (
+      <div 
+        class={(tab.isActive) ? 'tab' : 'tab inactive'}
+        style={{width: (100 / state.tabs.length)+'%'}}
+        onClick={() => dispatch({type: 'changeActiveTab', payload: tab.id})}
+      >
+        { tab.url }
+      </div>
+    ));
+  }
+
   return (
     <section class={css.container}>
       <header class={clsx('app-window-drag-handle', css.header)} />
@@ -58,7 +95,7 @@ const Safari = () => {
             <div style={{width: '100%', display: 'flex'}}>
               <input 
                 placeholder="Search" 
-                value={address} 
+                value={state.address} 
                 onKeyUp={(e) => handleKeyPress(e)}
               />
 
@@ -66,10 +103,18 @@ const Safari = () => {
                 <AppIcon size={20} path={mdiRefresh} />
               </button>
             </div>
+
+            <button onClick={newTab}>
+                <AppIcon size={20} path={mdiPlus} />
+              </button>
+          </div>
+
+          <div class={css.tabs}>
+            { tabRow() }
           </div>
         </div>
         
-        <webview src={address} ref={iframeEl} style={{height: '100%', width: '99.9%', marginLeft: '0.1%'}}>
+        <webview src={state.address} ref={iframeEl} style={{height: 'calc(100% - 107px)', width: 'calc(100% - 2px)', marginLeft: '1px'}}>
 
         </webview>
       </section>

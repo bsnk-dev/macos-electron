@@ -59,7 +59,7 @@ $blue: rgba(10, 132, 255, 0.8);
     border-radius: 0.375rem;
     box-shadow: hsla(var(--app-color-dark-hsl), 0.4) 0px 0.5px 2px;
 
-    background-color: var(--bgcolor);
+    background-color: transparent;
 
     color: var(--app-color-dark);
     fill: var(--app-color-dark);
@@ -78,6 +78,10 @@ $blue: rgba(10, 132, 255, 0.8);
 
     &:focus {
       border-color: $blue;
+    }
+
+    &:hover {
+      background-color: var(--bgcolor);
     }
 
     transition: background-color 0s;
@@ -124,12 +128,49 @@ $blue: rgba(10, 132, 255, 0.8);
   }
 }
 
+.tabs {
+  display: flex;
+  margin-top: 5px;
+  margin-right: -9px;
+  margin-left: -9px;
+
+
+  :global .tab {
+    --bgcolor: hsla(var(--app-color-light-hsl), 0.5);
+    --bgcolor-hover: hsla(var(--app-color-light-hsl), 0.6);
+
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+
+    :global(body.dark) & {
+      --bgcolor: var(--app-color-grey-A400);
+      --bgcolor-hover: var(--app-color-grey-800);
+      box-shadow: 0 0 white;
+    }
+
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    &.inactive {
+      background-color: var(--bgcolor);
+
+      &:hover {
+        background-color: var(--bgcolor-hover);
+      }
+    }
+  }
+}
+
 .calendarHeader {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: space-between;
 
   padding: 10px;
+  padding-bottom: 0px;
 }
 
 .mainArea {
@@ -143,33 +184,4 @@ $blue: rgba(10, 132, 255, 0.8);
 
   display: flex;
   flex-direction: column;
-}
-
-iframe {
-  /* Turn on custom 8px wide scrollbar */
-  &::-webkit-scrollbar {
-    width: 8px; /* 1px wider than Lion. */
-    /* This is more usable for users trying to click it. */
-    background-color: rgba(0,0,0,0);
-    -webkit-border-radius: 100px;
-  }
-  /* hover effect for both scrollbar area, and scrollbar 'thumb' */
-  &::-webkit-scrollbar:hover {
-    background-color: rgba(0, 0, 0, 0.09);
-  }
-
-  /* The scrollbar 'thumb' ...that marque oval shape in a scrollbar */
-  &::-webkit-scrollbar-thumb:vertical {
-    /* This is the EXACT color of Mac OS scrollbars. 
-      Yes, I pulled out digital color meter */
-    background: rgba(0,0,0,0.5);
-    -webkit-border-radius: 100px;
-  }
-  &::-webkit-scrollbar-thumb:vertical:active {
-    background: rgba(19, 5, 5, 0.61); /* Some darker color when you click it */
-    -webkit-border-radius: 100px;
-  }
-
-  background: linear-gradient(45deg, white, silver);
-  min-height: 100%;
 }
