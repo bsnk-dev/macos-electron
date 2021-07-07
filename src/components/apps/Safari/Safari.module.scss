@@ -1,0 +1,167 @@
+$blue: rgba(10, 132, 255, 0.8);
+
+.header {
+  padding: 1rem;
+}
+
+.container {
+  background-color: var(--app-color-light);
+
+  border-radius: inherit;
+
+  overflow: hidden;
+
+  :global(body.dark) & {
+    box-shadow: inset 0 0 0 0.9px hsla(var(--app-color-dark-hsl), 0.2),
+      0 0 0 1.5px hsla(var(--app-color-light-hsl), 0.5);
+  }
+}
+
+.buttonsContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: 2px;
+
+  margin: 1.5px;
+
+  & > button {
+    font-size: 1.618rem;
+    font-weight: 300 !important;
+    color: white;
+    fill: white;
+  }
+}
+
+.showArea {
+  font-size: 3rem;
+  color: white;
+  text-align: end;
+  font-weight: 200;
+
+  overflow: auto;
+
+  padding: 0.5rem 1rem;
+}
+
+.controlButtons {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+
+  transition: border 0.3s;
+  margin-bottom: 5px;
+
+  button {
+    --bgcolor: hsla(var(--app-color-light-hsl), 0.5);
+
+    border: 3px solid transparent;
+    border-radius: 0.375rem;
+    box-shadow: hsla(var(--app-color-dark-hsl), 0.4) 0px 0.5px 2px;
+
+    background-color: var(--bgcolor);
+
+    color: var(--app-color-dark);
+    fill: var(--app-color-dark);
+    font-weight: bold;
+
+    padding: 0.2rem 0.5rem;
+    margin: 0 0.2rem;
+
+    min-height: 1.2rem;
+    max-height: 1.8rem;
+
+    :global(body.dark) & {
+      --bgcolor: var(--app-color-grey-800);
+      box-shadow: 0 0 white;
+    }
+
+    &:focus {
+      border-color: $blue;
+    }
+  }
+
+  input {
+    --bgcolor: hsla(var(--app-color-light-hsl), 0.5);
+
+    border-radius: 0.375rem;
+    border: 3px solid transparent;
+
+    text-align: center;
+
+    background-color: var(--bgcolor);
+
+    color: var(--app-color-dark);
+    fill: var(--app-color-dark);
+    font-weight: bold;
+
+    padding: 0.2rem 0.5rem;
+    margin: 0 0.1rem;
+    margin-left: auto;
+    margin-right: auto;
+    
+    min-width: 200px;
+    width: 50%;
+
+    height: 1.8rem;
+
+    :global(body.dark) & {
+      --bgcolor: var(--app-color-grey-800);
+    }
+
+    &:focus {
+      border-color: $blue;
+    }
+  }
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 10px;
+}
+
+.mainArea {
+  color: var(--app-color-light-contrast);
+
+  height: 100%;
+
+  width: 100%;
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+iframe {
+  /* Turn on custom 8px wide scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px; /* 1px wider than Lion. */
+    /* This is more usable for users trying to click it. */
+    background-color: rgba(0,0,0,0);
+    -webkit-border-radius: 100px;
+  }
+  /* hover effect for both scrollbar area, and scrollbar 'thumb' */
+  &::-webkit-scrollbar:hover {
+    background-color: rgba(0, 0, 0, 0.09);
+  }
+
+  /* The scrollbar 'thumb' ...that marque oval shape in a scrollbar */
+  &::-webkit-scrollbar-thumb:vertical {
+    /* This is the EXACT color of Mac OS scrollbars. 
+      Yes, I pulled out digital color meter */
+    background: rgba(0,0,0,0.5);
+    -webkit-border-radius: 100px;
+  }
+  &::-webkit-scrollbar-thumb:vertical:active {
+    background: rgba(19, 5, 5, 0.61); /* Some darker color when you click it */
+    -webkit-border-radius: 100px;
+  }
+
+  background: linear-gradient(45deg, white, silver);
+  min-height: 100%;
+}
