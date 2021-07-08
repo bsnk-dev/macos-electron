@@ -1,5 +1,6 @@
 export interface IState {
-  address: string;
+  setAddress: string;
+  address: string,
   tabs: ITab[];
   lastID: number;
 }
@@ -7,19 +8,27 @@ export interface IState {
 interface ITab {
   id: number;
   url: string;
+  title: string;
   isActive: boolean,
 }
 
+interface ITabCosmetic {
+  title: string;
+  url: string;
+}
+
 export interface ActionT {
-  type: 'setAddress' | 'addTab' | 'removeTab' | 'changeActiveTab';
-  payload: string | number | {url: string};
+  type: 'setAddress' | 'setContextAddress' | 'addTab' | 'removeTab' | 'changeActiveTab';
+  payload: string | number | ITabCosmetic;
 }
 
 export const initialState: IState = {
-  address: 'https://google.com',
+  setAddress: 'https://google.com',
+  address: '',
   tabs: [{
     id: 0,
     url: 'https://google.com',
+    title: 'Google',
     isActive: true,
   }],
   lastID: 0,
@@ -49,7 +58,24 @@ export function safariReducer(state: IState, action: ActionT): IState {
       }
 
       return {
-        address: payload as string,
+        ...state,
+        setAddress: payload as string,
+        tabs: tabs,
+        lastID: state.lastID,
+      };
+    } case 'setContextAddress': {
+      const tabs = JSON.parse(JSON.stringify(state.tabs)) as ITab[];
+
+      for (const tab of tabs) {
+        if (tab.isActive) {
+          tab.url = (payload as ITabCosmetic).url;
+          tab.title = (payload as ITabCosmetic).title;
+        }
+      }
+
+      return {
+        ...state,
+        address: (payload as ITabCosmetic).url,
         tabs: tabs,
         lastID: state.lastID,
       };
@@ -61,13 +87,14 @@ export function safariReducer(state: IState, action: ActionT): IState {
         id: state.lastID + 1,
         url: payload as string,
         isActive: true,
+        title: payload as string,
       });
 
-      const address = changeActiveTab(tabs, state.lastID + 1);
+      const setAddress = changeActiveTab(tabs, state.lastID + 1);
 
       return {
         ...state,
-        address,
+        setAddress,
         tabs,
         lastID: state.lastID+1,
       };
@@ -82,31 +109,31 @@ export function safariReducer(state: IState, action: ActionT): IState {
       
       let nextTab;
 
-      if (tabs[tabIndex - 1]) {
-        nextTab = tabs[tabIndex - 1];
-      } else {
+      if (tabs[tabIndex + 1]) {
         nextTab = tabs[tabIndex + 1];
+      } else {
+        nextTab = tabs[tabIndex - 1];
       }
 
       tabs = tabs.filter((tab) => tab.id !== payload as number);
 
-      const address = changeActiveTab(tabs, nextTab.id);
+      const setAddress = changeActiveTab(tabs, nextTab.id);
 
       return {
         ...state,
-        address,
+        setAddress,
         tabs,
       };
     } case 'changeActiveTab': {
       let tabs: ITab[] = []; 
       tabs = tabs.concat(state.tabs);
 
-      const address = changeActiveTab(tabs, payload as number);
+      const setAddress = changeActiveTab(tabs, payload as number);
 
       return {
         ...state,
         tabs,
-        address,
+        setAddress,
       };
     }
   }

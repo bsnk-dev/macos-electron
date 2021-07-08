@@ -51,7 +51,7 @@ const Safari = () => {
   }
 
   function refreshSiteDetails() {
-    dispatch({type: 'setAddress', payload: iframeEl.current.getURL()});
+    dispatch({type: 'setContextAddress', payload: {url: iframeEl.current.getURL(), title: iframeEl.current.getTitle()}});
   }
 
   useEffect(() => {
@@ -85,8 +85,8 @@ const Safari = () => {
           </button>
         </div>
 
-        <div style={{margin: 'auto'}}>
-          { tab.url.slice(0, 24) }
+        <div style={{margin: 'auto', overflow: 'hidden'}}>
+          { tab.title }
         </div>
       </div>
     ));
@@ -126,7 +126,7 @@ const Safari = () => {
           </div>
         </div>
         
-        <webview src={state.address} ref={iframeEl} style={{height: 'calc(100%)', width: 'calc(100% - 2px)', marginLeft: '1px'}}>
+        <webview src={state.setAddress} ref={iframeEl} style={{height: 'calc(100%)', width: 'calc(100% - 2px)', marginLeft: '1px'}}>
 
         </webview>
       </section>
