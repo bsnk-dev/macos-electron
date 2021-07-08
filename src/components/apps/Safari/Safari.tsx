@@ -1,5 +1,5 @@
 import { useReducer, useRef } from 'react';
-import { mdiChevronLeft, mdiChevronRight, mdiRefresh, mdiPlus } from '@mdi/js';
+import { mdiChevronLeft, mdiChevronRight, mdiRefresh, mdiPlus, mdiClose } from '@mdi/js';
 import clsx from 'clsx';
 import { AppIcon } from '__/components/utils/AppIcon';
 import {
@@ -42,6 +42,14 @@ const Safari = () => {
     iframeEl.current.reload()
   }
 
+  function newTab() {
+    dispatch({type: 'addTab', payload: 'https://google.com/'});
+  }
+
+  function closeTab(tabID: number) {
+    dispatch({type: 'removeTab', payload: tabID});
+  }
+
   function refreshSiteDetails() {
     dispatch({type: 'setAddress', payload: iframeEl.current.getURL()});
   }
@@ -49,6 +57,8 @@ const Safari = () => {
   useEffect(() => {
     if (iframeEl && iframeEl.current) {
       iframeEl.current.addEventListener('load-commit', (e) => {
+        iframeEl.current.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.123 Safari/537.36');
+      
         refreshSiteDetails();
 
         iframeEl.current.insertCSS(`::-webkit-scrollbar { width: 8px; /* 1px wider than Lion. */ /* This is more usable for users trying to click it. */ background-color: rgba(0,0,0,0); -webkit-border-radius: 100px; } /* hover effect for both scrollbar area, and scrollbar 'thumb' */ ::-webkit-scrollbar:hover { background-color: rgba(0, 0, 0, 0.09); }
@@ -57,14 +67,8 @@ const Safari = () => {
        
         background: linear-gradient(45deg, white, silver); min-height: 100%;`);
       });
-
-      iframeEl.current.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.123 Safari/537.36');
     }
   });
-
-  function newTab() {
-    // ...
-  }
 
   function tabRow() {
     if (state.tabs.length < 2) return '';
@@ -75,7 +79,15 @@ const Safari = () => {
         style={{width: (100 / state.tabs.length)+'%'}}
         onClick={() => dispatch({type: 'changeActiveTab', payload: tab.id})}
       >
-        { tab.url }
+        <div style={{textAlign: 'left'}}>
+          <button class={css.button} onClick={() => closeTab(tab.id)}>
+            <AppIcon size={14} path={mdiClose}></AppIcon>
+          </button>
+        </div>
+
+        <div style={{margin: 'auto'}}>
+          { tab.url.slice(0, 24) }
+        </div>
       </div>
     ));
   }
@@ -114,7 +126,7 @@ const Safari = () => {
           </div>
         </div>
         
-        <webview src={state.address} ref={iframeEl} style={{height: 'calc(100% - 107px)', width: 'calc(100% - 2px)', marginLeft: '1px'}}>
+        <webview src={state.address} ref={iframeEl} style={{height: 'calc(100%)', width: 'calc(100% - 2px)', marginLeft: '1px'}}>
 
         </webview>
       </section>

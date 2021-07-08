@@ -1,11 +1,13 @@
 export interface IState {
   address: string;
-  tabs: {
-    id: number;
-    url: string;
-    isActive: boolean,
-  }[];
+  tabs: ITab[];
   lastID: number;
+}
+
+interface ITab {
+  id: number;
+  url: string;
+  isActive: boolean,
 }
 
 export interface ActionT {
@@ -19,21 +21,20 @@ export const initialState: IState = {
     id: 0,
     url: 'https://google.com',
     isActive: true,
-  }, 
-  {
-    id: 1,
-    url: 'https://bsnk.dev',
-    isActive: false,
   }],
-  lastID: 1,
+  lastID: 0,
 };
 
-function changeActiveTab(state: IState, tabID: number) {
-  for (const tab of state.tabs) {
+function changeActiveTab(tabs: ITab[], tabID: number) {
+  let returnURL = 'https://google.com';
+  
+  for (const tab of tabs) {
     tab.isActive = (tab.id === tabID);
 
-    if (tab.id === tabID) state.address = tab.url;
+    if (tab.id === tabID) returnURL = tab.url;
   }
+
+  return returnURL;
 }
 
 export function safariReducer(state: IState, action: ActionT): IState {
@@ -41,31 +42,72 @@ export function safariReducer(state: IState, action: ActionT): IState {
 
   switch (type) {
     case 'setAddress': {
-      state.address = payload as string;
+      const tabs = JSON.parse(JSON.stringify(state.tabs)) as ITab[];
 
-      for (const tab of state.tabs) {
+      for (const tab of tabs) {
         if (tab.isActive) tab.url = payload as string;
       }
 
-      return state;
+      return {
+        address: payload as string,
+        tabs: tabs,
+        lastID: state.lastID,
+      };
     } case 'addTab': {
-      state.tabs.push({
+      let tabs: ITab[] = []; 
+      tabs = tabs.concat(state.tabs);
+
+      tabs.push({
         id: state.lastID + 1,
-        url: (payload as {url: string}).url,
+        url: payload as string,
         isActive: true,
       });
 
-      changeActiveTab(state, state.lastID + 1);
+      const address = changeActiveTab(tabs, state.lastID + 1);
 
-      state.lastID++;
-
-      return state;
+      return {
+        ...state,
+        address,
+        tabs,
+        lastID: state.lastID+1,
+      };
     } case 'removeTab': {
-      // ...
-    } case 'changeActiveTab': {
-      changeActiveTab(state, payload as number);
+      let tabs: ITab[] = []; 
+      tabs = tabs.concat(state.tabs);
 
-      return state;
+      const tab = tabs.find((tab) => tab.id === payload as number);
+      if (!tab) return state;
+
+      const tabIndex = tabs.indexOf(tab);
+      
+      let nextTab;
+
+      if (tabs[tabIndex - 1]) {
+        nextTab = tabs[tabIndex - 1];
+      } else {
+        nextTab = tabs[tabIndex + 1];
+      }
+
+      tabs = tabs.filter((tab) => tab.id !== payload as number);
+
+      const address = changeActiveTab(tabs, nextTab.id);
+
+      return {
+        ...state,
+        address,
+        tabs,
+      };
+    } case 'changeActiveTab': {
+      let tabs: ITab[] = []; 
+      tabs = tabs.concat(state.tabs);
+
+      const address = changeActiveTab(tabs, payload as number);
+
+      return {
+        ...state,
+        tabs,
+        address,
+      };
     }
   }
 
